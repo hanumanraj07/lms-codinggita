@@ -5,15 +5,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
 
-  return (
-    <BrowserRouter>
+  return ( 
 
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
       </Routes>
-
-    </BrowserRouter>
+ 
   )
 }
 
