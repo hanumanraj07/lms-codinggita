@@ -1,15 +1,35 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+
+const DUMMY_USERS = [
+  { role: "Student", identifier: "108711", password: "123456" },
+  { role: "Mentor", identifier: "mentor@example.com", password: "mentorpassword" },
+  { role: "Admin", identifier: "admin@example.com", password: "adminpassword" }
+];
 
 export default function Login() {
+  const navigate = useNavigate();
 
   const [role, setRole] = useState(() => localStorage.getItem("login_role") || "Student")
   const [identifier, setIdentifier] = useState(() => localStorage.getItem("login_identifier") || "")
   const [password, setPassword] = useState(() => localStorage.getItem("login_password") || "")
+  const [error, setError] = useState("")
 
   const handleLogin = () => {
-    localStorage.setItem("login_role", role);
-    localStorage.setItem("login_identifier", identifier);
-    localStorage.setItem("login_password", password);
+    const user = DUMMY_USERS.find(
+      (u) => u.role === role && u.identifier === identifier && u.password === password
+    );
+
+    if (user) {
+      localStorage.setItem("login_role", role);
+      localStorage.setItem("login_identifier", identifier);
+      localStorage.setItem("login_password", password);
+      setError("");
+      console.log("Logged in and saved data to local storage!");
+      navigate("/student-dashboard");
+    } else {
+      setError("Wrong data entered");
+    }
   };
 
   return (
@@ -28,7 +48,7 @@ export default function Login() {
           <div className="flex gap-3">
 
             <button
-              onClick={() => setRole("Student")}
+              onClick={() => { setRole("Student"); setError(""); }}
               className={`px-4 py-2 rounded-lg border ${role === "Student"
                 ? "bg-white text-black"
                 : "border-zinc-700 text-white"
@@ -38,7 +58,7 @@ export default function Login() {
             </button>
 
             <button
-              onClick={() => setRole("Mentor")}
+              onClick={() => { setRole("Mentor"); setError(""); }}
               className={`px-4 py-2 rounded-lg border ${role === "Mentor"
                 ? "bg-white text-black"
                 : "border-zinc-700 text-white"
@@ -48,7 +68,7 @@ export default function Login() {
             </button>
 
             <button
-              onClick={() => setRole("Admin")}
+              onClick={() => { setRole("Admin"); setError(""); }}
               className={`px-4 py-2 rounded-lg border ${role === "Admin"
                 ? "bg-white text-black"
                 : "border-zinc-700 text-white"
@@ -68,7 +88,7 @@ export default function Login() {
           <input
             type={role === "Student" ? "text" : "email"}
             value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            onChange={(e) => { setIdentifier(e.target.value); setError(""); }}
             placeholder={
               role === "Student"
                 ? "Enter your University UID"
@@ -84,11 +104,13 @@ export default function Login() {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setError(""); }}
             placeholder="••••••••"
             className="w-full p-3 rounded-lg bg-black border border-zinc-700 outline-none focus:border-gray-500"
           />
         </div>
+
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <button
           onClick={handleLogin}
